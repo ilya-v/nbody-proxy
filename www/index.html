@@ -1,17 +1,28 @@
-<html lang=en><head></head <body>
-<a href="1">1</a>
+<html lang=en>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+
+<body>
+
+<div id="commands-panel"></div>
+<div id="status-panel"></div>
+<div id="results-panel"></div>
+
+<script>
+$( "#commands-panel" ).load("/commands.html");
+
+window.setInterval(loadResults, 10*1000);
+window.setInterval(loadStatus, 10*1000);
+
+function loadResults() { $( "#results-panel" ).load("/results.html"); }
+function loadStatus()  { 
+	$.post("/status");
+	$( "#status-panel"  ).load("/status.html" ); 
+}
+
+</script>
 
 
-<form action="/cgi-bin/upload" enctype="multipart/form-data" method="post">
-
-<p>
-<input type="file" name="datafile" size="40">
-</p>
-<div>
-<input type="submit" value="Send">
-</div>
-</form>
-
-
-
-</body></html>
+</body>
+</html>

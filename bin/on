@@ -1,0 +1,13 @@
+MID="pssvrnxlp"
+paperspace machines start --machineId "$MID" >> /dev/null
+
+while true; do
+  paperspace machines show --machineId "$MID" | jq '.state' | grep 'ready' >/dev/null
+  [[ $? ]] && echo "Started" && exit 0
+  echo -n "."
+  sleep 5
+done
+
+
+
+

@@ -1,0 +1,10 @@
+#!/bin/bash
+
+#paperspace machines list | grep -E '\"id\"|\"name\"|\"state\"'
+paperspace machines list | jq '.[0] | .id, .name, .state' > /var/www/nbody/status.html
+
+printf "content-type: text/plain\r\n\r\n"
+echo "Hello !"
+echo "Your remove address is ${REMOTE_ADDR}"
+echo "Server time is: $(date)"
+
