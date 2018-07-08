@@ -1,0 +1,4 @@
+#paperspace machines list | grep -E '\"id\"|\"name\"|\"state\"'
+paperspace machines list | jq '.[0] | .id, .name, .state'
+
+
