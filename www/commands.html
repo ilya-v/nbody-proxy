@@ -1,3 +1,24 @@
+<script>
+	function turnOn() {
+		$.ajax({
+			url: '/on',
+			type: 'post'
+		});
+	}
+
+	function turnOff() {
+		$.ajax({
+			url: '/off',
+			type: 'post'
+		});
+	}
+</script>
+
+
+<button onclick="javascript:turnOn();">Turn On</button>
+<button onclick="javascript:turnOff();">Turn Off</button>
+
+
 
 <form action="/cgi-bin/upload" enctype="multipart/form-data" method="post">
 

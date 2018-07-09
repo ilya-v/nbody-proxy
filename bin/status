@@ -1,10 +1,17 @@
 #!/bin/bash
 
 #paperspace machines list | grep -E '\"id\"|\"name\"|\"state\"'
-paperspace machines list | jq '.[0] | .id, .name, .state' > /var/www/nbody/status.html
 
-printf "content-type: text/plain\r\n\r\n"
-echo "Hello !"
-echo "Your remove address is ${REMOTE_ADDR}"
-echo "Server time is: $(date)"
+OUT=/tmp/status.$$
+cd "$(dirname "$0")"
+export PAPERSPACE_API_KEY=$(./apikey)
 
+printf "content-type: text/html\r\n\r\n" > $OUT
+
+echo "<pre>" >> $OUT
+echo "$(date)" >> $OUT
+paperspace machines list | jq '.[0] | .id, .name, .state' >> $OUT
+echo "</pre>" >> $OUT
+
+cat $OUT
+rm $OUT

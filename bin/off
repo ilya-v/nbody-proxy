@@ -1,2 +1,7 @@
+#!/bin/bash
+
+cd "$(dirname "$0")"
+export PAPERSPACE_API_KEY=$(./apikey)
+
 paperspace machines stop --machineId "pssvrnxlp"
 

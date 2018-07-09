@@ -5,9 +5,17 @@
 
 <body>
 
+<div id="status-panel">
+<pre>
+
+
+
+
+</pre>
+</div>
 <div id="commands-panel"></div>
-<div id="status-panel"></div>
 <div id="results-panel"></div>
+
 
 <script>
 $( "#commands-panel" ).load("/commands.html");
@@ -17,10 +25,13 @@ window.setInterval(loadStatus, 10*1000);
 
 function loadResults() { $( "#results-panel" ).load("/results.html"); }
 function loadStatus()  { 
-	$.post("/status");
-	$( "#status-panel"  ).load("/status.html" ); 
+	$.post("/status")
+		.done(function(data) {
+			$( "#status-panel" ).empty().append(data);
+		});
 }
 
+loadStatus();
 </script>
 
 
