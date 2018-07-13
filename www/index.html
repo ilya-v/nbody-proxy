@@ -2,38 +2,17 @@
 <head>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 </head>
-
 <body>
 
-<div id="status-panel">
-<pre>
-
-
-
-
-</pre>
-</div>
+<div id="status-panel"></div>
 <div id="commands-panel"></div>
 <div id="results-panel"></div>
 
-
 <script>
 $( "#commands-panel" ).load("/commands.html");
-
-window.setInterval(loadResults, 10*1000);
-window.setInterval(loadStatus, 10*1000);
-
-function loadResults() { $( "#results-panel" ).load("/results.html"); }
-function loadStatus()  { 
-	$.post("/status")
-		.done(function(data) {
-			$( "#status-panel" ).empty().append(data);
-		});
-}
-
-loadStatus();
+$( "#status-panel" ).load("/status.html");
+$( "#results-panel" ).load("/results.html");
 </script>
-
 
 </body>
 </html>
