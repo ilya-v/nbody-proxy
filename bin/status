@@ -2,16 +2,21 @@
 
 #paperspace machines list | grep -E '\"id\"|\"name\"|\"state\"'
 
-OUT=/tmp/status.$$
+#OUT=/tmp/status.$$
 cd "$(dirname "$0")"
 export PAPERSPACE_API_KEY=$(./apikey)
 
-printf "content-type: text/html\r\n\r\n" > $OUT
+printf "content-type: text/html\r\n\r\n"
+# > $OUT
 
-echo "<pre>" >> $OUT
-echo "$(date)" >> $OUT
-paperspace machines list | jq '.[0] | .id, .name, .state' >> $OUT
-echo "</pre>" >> $OUT
+echo "<pre>"
+# >> $OUT
+echo "$(date)"
+# >> $OUT
+paperspace machines list | jq '.[0] | .name, .state'
+# >> $OUT
+echo "</pre>" 
+#>> $OUT
 
-cat $OUT
-rm $OUT
+#cat $OUT
+#rm $OUT
