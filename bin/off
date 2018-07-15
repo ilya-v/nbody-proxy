@@ -1,5 +1,10 @@
 #!/bin/bash
 
+
+printf "content-type: text/html\r\n\r\n"
+echo "<pre></pre>"
+
+
 cd "$(dirname "$0")"
 export PAPERSPACE_API_KEY=$(./apikey)
 
