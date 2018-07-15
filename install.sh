@@ -21,5 +21,12 @@ mkdir -p /var/www/nbody
 cp -R ./www/* /var/www/nbody
 chmod -R a+r-w /var/www/nbody
 chmod a+x /var/www/nbody
-
 chown -R www-data:www-data /var/www/nbody
+
+mkdir -p /var/www/.ssh
+cp /root/.ssh/id_rsa* /var/www/.ssh/
+chown -R www-data:www-data /var/www/.ssh
+chmod -R 600 /var/www/.ssh
+chmod oa+x /var/www/.ssh
+
+systemctl reload nginx

@@ -1,0 +1,37 @@
+
+<div id="status-panel-impl">
+<pre>
+    Checking the status of the machine...
+
+
+</pre>
+</div>
+
+<script>
+	function getStatus() {
+		$.post('/status', {},
+            function(data, status) {
+			    $( "#status-panel-impl" ).html(data);
+		    });
+	}
+	getStatus();
+
+	function turnOn() {
+		$.ajax({
+			url: '/on',
+			type: 'post'
+		});
+	}
+
+	function turnOff() {
+		$.ajax({
+			url: '/off',
+			type: 'post'
+		});
+	}
+</script>
+
+
+<button onclick="javascript:getStatus();">Check Machine Status</button>
+<button onclick="javascript:turnOn();">Turn On</button>
+<button onclick="javascript:turnOff();">Turn Off</button>

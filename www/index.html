@@ -5,12 +5,14 @@
 <body>
 
 <div id="status-panel"></div>
+<hr>
 <div id="commands-panel"></div>
+<hr>
 <div id="results-panel"></div>
 
 <script>
+$( "#status-panel" ).load("/stat.html");
 $( "#commands-panel" ).load("/commands.html");
-$( "#status-panel" ).load("/status.html");
 $( "#results-panel" ).load("/results.html");
 </script>
 

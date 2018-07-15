@@ -1,0 +1,13 @@
+#!/bin/bash
+
+cd "$(dirname "$0")"
+printf "content-type: text/html\r\n\r\n"
+
+OUT=$(date; ssh -p 8023 \
+    -o BatchMode=yes paperspace@localhost \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    "ps aux | grep nbody | grep -v 'grep'"  2>/dev/null)
+[[ "$?" == "255" ]] && echo "Cannot reach the remote machine: $OUT" && exit
+
+echo $OUT
