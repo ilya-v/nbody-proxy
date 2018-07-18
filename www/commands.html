@@ -1,19 +1,80 @@
-<pre id="app-status-panel-impl">
-   
-</pre>
-    
 
 <script>
     function getAppStatus() {
 		$.post('/app-status', {},
-            function(data, status) {
-			    $( "#app-status-panel-impl" ).html(data);
-		    });
+			function(data, status) {
+				$( "#app-status-panel-impl" ).html(data);
+			});
+	}
+	function killApp() {
+		$.ajax({
+			url: '/app-kill',
+			type: 'post'
+		});
+	}
+	function startApp() {
+		var theInput = document.getElementById("runName");
+		var name = theInput.value;
+		var tnow = new Date();
+		var ts = tnow.toISOString()
+			.replace(/[^a-z0-9]/g, " ")
+			.replace(/\s+$/, "")
+			.replace(/\s+/g, '-').toLowerCase();
+
+		$.post('/app-start', { 
+			name: name, 
+			seed: '100 ',
+			timestamp: ts, 
+			},
+			function(data, status) {
+				$( "#app-start-panel-impl" ).html(data);
+			});
 	}
 	getAppStatus();
 </script>
-<button onclick="javascript:getAppStatus();">Check Application Status</button>
 
+<table>
+	<tr>
+		<td>
+			<button onclick="javascript:getAppStatus();">
+				Check Application Status
+			</button>
+		</td>
+		<td>
+			<pre id="app-status-panel-impl">
+
+			</pre>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<button onclick="javascript:startApp();">
+				Start Application
+			</button>
+		</td>
+		<td>
+			<pre id="app-start-panel-impl">
+	
+			</pre>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<button onclick="javascript:killApp();">
+				Kill Application
+			</button>
+		</td>
+		<td>
+			<pre id="app-kill-panel-impl">
+	
+			</pre>
+		</td>
+	</tr>	
+</table>
+
+
+<br>
+<input type="text" maxlength="32" id="runName">
 
 <form action="/upload" enctype="multipart/form-data" method="post">
 <p>
