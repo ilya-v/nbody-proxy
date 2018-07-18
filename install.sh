@@ -19,8 +19,7 @@ echo "echo $(cat ~/.paperspace/config.json  | jq '.apiKey')" > /var/www/nbody-bi
 
 mkdir -p /var/www/nbody
 cp -R ./www/* /var/www/nbody
-chmod -R a+r-w /var/www/nbody
-chmod a+x /var/www/nbody
+chmod  -R u=rwx,g=rx,o=r /var/www/nbody
 chown -R www-data:www-data /var/www/nbody
 
 mkdir -p /var/www/.ssh
