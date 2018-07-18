@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cd "$(dirname "$0")"
+printf "content-type: text/html\r\n\r\n"
+
+ssh -p 8023 \
+    -o BatchMode=yes paperspace@localhost \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null \
+    "killall nbody"  2>/dev/null

@@ -1,0 +1,39 @@
+#!/bin/bash
+
+cd "$(dirname "$0")"
+printf "content-type: text/html\r\n\r\n"
+
+STATUS=$(./app-status)
+echo $STATUS | grep 'nbody' 2>&1 1>/dev/null
+[[ "$?" == "0" ]] &&  \
+    echo "$(date): Cannot start: already running." && \
+    exit
+
+SSH_OPT="-p 8023 \
+    -o BatchMode=yes paperspace@localhost \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null"
+
+STEM=$(echo "$REQUEST_BODY" | 
+    tr '&' '\n' | 
+    grep -E '^[ \t]*name[ \t]*=' | 
+    cut -d '=' -f2 | 
+    tr -d ' \t')
+
+TS=$(echo "$REQUEST_BODY" | 
+    tr '&' '\n' | 
+    grep -E '^[ \t]*timestamp[ \t]*=' | 
+    cut -d '=' -f2 | 
+    tr -d ' \t')
+
+[[ ! "$STEM" && ! "$TS" ]] && exit
+NAME="${STEM:-run}-$TS"
+
+mkdir -p "/var/www/nbody/$NAME"
+pushd "/var/www/nbody/$NAME" 2>&1 1>/dev/null
+echo "$REQUEST_BODY" | tr '&' '\n' > params.txt
+
+
+echo "$(date): started $NAME"
+#ssh $SSH_OPT "mkdir -p ~/nbody-run/$NAME"
+
