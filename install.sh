@@ -19,13 +19,30 @@ echo "echo $(cat ~/.paperspace/config.json  | jq '.apiKey')" > /var/www/nbody-bi
 
 mkdir -p /var/www/nbody
 cp -R ./www/* /var/www/nbody
-chmod  -R u=rwx,g=rx,o=r /var/www/nbody
 chown -R www-data:www-data /var/www/nbody
+chmod  -R u=rw,g=r,o=r /var/www/nbody
+chmod  u+x,g+x,o+x /var/www/nbody
+
 
 mkdir -p /var/www/.ssh
 cp /root/.ssh/id_rsa* /var/www/.ssh/
 chown -R www-data:www-data /var/www/.ssh
 chmod -R 600 /var/www/.ssh
 chmod oa+x /var/www/.ssh
+
+rm -rf /var/www/nbody-app
+mkdir -p /var/www/nbody-app
+cd /var/www/nbody-app
+wget https://github.com/ilya-v/nbody-cuda/archive/master.zip
+unzip *.zip
+rm *zip
+cd *master
+mv * ../
+cd ..
+chown -R www-data:www-data /var/www/nbody-app
+chmod  -R u=rw,g=r,o=r /var/www/nbody-app
+chmod  u+x,g+x,o+x /var/www/nbody-app
+
+cd $SCRIPTPATH
 
 systemctl reload nginx

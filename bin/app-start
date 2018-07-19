@@ -14,12 +14,14 @@ SSH_OPT="-p 8023 \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null"
 
+#base name of the run
 STEM=$(echo "$REQUEST_BODY" | 
     tr '&' '\n' | 
     grep -E '^[ \t]*name[ \t]*=' | 
     cut -d '=' -f2 | 
     tr -d ' \t')
 
+#timestamp
 TS=$(echo "$REQUEST_BODY" | 
     tr '&' '\n' | 
     grep -E '^[ \t]*timestamp[ \t]*=' | 
@@ -27,6 +29,8 @@ TS=$(echo "$REQUEST_BODY" |
     tr -d ' \t')
 
 [[ ! "$STEM" && ! "$TS" ]] && exit
+
+#full name of the run
 NAME="${STEM:-run}-$TS"
 
 mkdir -p "/var/www/nbody/$NAME"

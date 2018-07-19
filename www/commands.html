@@ -21,10 +21,10 @@
 			.replace(/\s+$/, "")
 			.replace(/\s+/g, '-').toLowerCase();
 
-		$.post('/app-start', { 
-			name: name, 
+		$.post('/app-start', {
+			name: name,
 			seed: '100 ',
-			timestamp: ts, 
+			timestamp: ts,
 			},
 			function(data, status) {
 				$( "#app-start-panel-impl" ).html(data);
@@ -54,7 +54,7 @@
 		</td>
 		<td>
 			<pre id="app-start-panel-impl">
-	
+
 			</pre>
 		</td>
 	</tr>
@@ -66,10 +66,10 @@
 		</td>
 		<td>
 			<pre id="app-kill-panel-impl">
-	
+
 			</pre>
 		</td>
-	</tr>	
+	</tr>
 </table>
 
 

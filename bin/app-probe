@@ -1,0 +1,44 @@
+#!/bin/bash
+
+cd "$(dirname "$0")"
+printf "content-type: text/html\r\n\r\n"
+
+STATUS=$(./status)
+echo $STATUS | grep 'ready' 2>&1 1>/dev/null
+[[ "$?" != "0" ]] &&
+    echo '-- The remote machine is not running. Bailing out.' &&
+    exit
+
+SSH_OPT="-o Port=8023 \
+    -o BatchMode=yes \
+    -o NoHostAuthenticationForLocalhost=yes \
+    -o StrictHostKeyChecking=no \
+    -o UserKnownHostsFile=/dev/null"
+SSH_DEST=paperspace@localhost
+
+
+mkdir -p /var/www/nbody/_params
+chmod u=rwx,o=rx /var/www/nbody/_params
+pushd /var/www/nbody/_params 2>&1 1>/dev/null
+
+PARAMS_DIR="./nbody-run/_params"
+BUILD_CMD="nvcc -arch=sm_61 -o nbody-app *.cu"
+
+ssh $SSH_OPT $SSH_DEST "mkdir -p $PARAMS_DIR"
+
+scp  $SSH_OPT  /var/www/nbody-app/*.cu $SSH_DEST:$PARAMS_DIR 1>/dev/null
+[[ "$?" != "0" ]] && 
+    echo "Cannot upload the app code to the remote machine." &&
+    exit
+
+ssh $SSH_OPT $SSH_DEST \
+    "cd $PARAMS_DIR; $BUILD_CMD; ./nbody-app -p > params.txt;" 
+[[ "$?" != "0" ]] && 
+    echo "Cannot build or run the app on the remote machine." &&
+    exit
+
+scp $SSH_OPT "$SSH_DEST:$PARAMS_DIR/*" ./  1>/dev/null
+
+cat ./params.txt
+popd 2>&1 1>/dev/null
+
