@@ -6,7 +6,7 @@ printf "content-type: text/html\r\n\r\n"
 STATUS=$(./status)
 echo $STATUS | grep 'ready' 2>&1 1>/dev/null
 [[ "$?" != "0" ]] &&
-    echo '$(date): The remote machine is not running. Bailing out.' &&
+    echo $(date)": The remote machine is not running. Bailing out." &&
     exit
 
 SSH_OPT="-o Port=8023 \
@@ -26,7 +26,7 @@ BUILD_CMD="nvcc -arch=sm_61 -o nbody-app *.cu"
 
 ssh $SSH_OPT $SSH_DEST "mkdir -p $PARAMS_DIR"
 [[ "$?" != "0" ]] && 
-    echo "$(date): Cannot create $PARAMS_DIR on the remote machine." &&
+    echo $(date) ": Cannot create $PARAMS_DIR on the remote machine." &&
     exit
 
 
