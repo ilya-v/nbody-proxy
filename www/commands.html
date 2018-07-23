@@ -25,7 +25,7 @@
 	}
 	function getAppStatus() {
 		$( "#app-status-panel-impl" ).html(
-			new Date().toString() + ": Checking..." );
+			new Date().toString() + ": Checking...\n" );
 		$.post('/app-status', {},
 			function(data, status) {
 				$( "#app-status-panel-impl" ).html(data);
@@ -46,12 +46,25 @@
 		$( "#app-start-panel-impl" ).html((new Date().toString()) +
 			": starting " + runName + "\n\n");
 
-		$.post('/app-start',
-			{
-				name: runName,
-				seed: '100 ',
-				timestamp: getTimestamp()
-			},
+		var params = {
+			name: runName,
+			seed: '100',
+			timestamp: getTimestamp()
+		};
+
+		var items = $( "#area-params" ).val()
+			.replace(/\r/,"")
+			.split("\n");
+
+		items.forEach( function(item) {
+			if (item.indexOf('=') > 0) {
+				var p = item.split('=');
+				params[p[0].trim().replace(/ /g, "-")] = 
+					p[1].trim().replace(/ /g, "-");
+			}
+		});
+
+		$.post('/app-start', params,
 			function(data, status) {
 				$( "#app-start-panel-impl" ).html(data);
 			}
@@ -59,15 +72,20 @@
 	}
 
 	function fetchResults() {
+		$( "#app-fetch-panel-impl" ).html((new Date().toString()) +
+			": Fetching results...");
+
 		$.post('/fetch-results', {},
 			function(data, status) {
-				$( "#results-panel" ).html(data);
-			});
+				$( "#app-fetch-panel-impl" ).html(data);
+				$( "#results-panel" ).load("/results.html");
+			}
+		);
 	}
-
 
 	getAppStatus();
 	getParams();
+	fetchResults();
 
 </script>
 
@@ -80,6 +98,7 @@
 		</td>
 		<td>
 			<pre id="app-status-panel-impl">
+
 
 			</pre>
 		</td>
@@ -144,4 +163,6 @@
 <hr>
 
 
-<div id="results-panel"> </div>
+<div id="results-panel">
+
+</div>
