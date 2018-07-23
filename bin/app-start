@@ -35,12 +35,20 @@ TS=$(echo "$REQUEST_BODY" |
 #full name of the run
 NAME="${STEM:-run}-$TS"
 
+# Create the local run directory
 mkdir -p "/var/www/nbody/${NAME}"
-chmod u=rwx,o=rx "/var/www/nbody/${NAME}"
 pushd "/var/www/nbody/${NAME}" 2>&1 1>/dev/null
 
+# Copy the application into the run directorty
+cp /var/www/nbody-app/* ./ 2>&1 | grep -v 'omitting directory'
+chmod u=rwx,o=rx ./
+
+# The remote run dir
 RUN_DIR="./nbody-run/${NAME}"
-BUILD_CMD="nvcc -arch=sm_61 -o nbody-app *.cu"
+
+# Create the params file in the local run dir
+echo "$REQUEST_BODY" |
+    tr '&' '\n' > "params.txt"
 
 ssh $SSH_OPT $SSH_DEST mkdir -p "$RUN_DIR"
 [[ "$?" != "0" ]] &&
@@ -50,14 +58,17 @@ ssh $SSH_OPT $SSH_DEST mkdir -p "$RUN_DIR"
 rsync -e "ssh  $SSH_OPT"  \
     --exclude 'data' --exclude 'cmake*' \
     -a \
-    /var/www/nbody-app/  $SSH_DEST:"$RUN_DIR/"  2>&1
+    ./  $SSH_DEST:"$RUN_DIR/"  2>&1
 #1>/dev/null
 [[ "$?" != "0" ]] &&
     echo "$(date): Cannot upload the app code to the remote machine." &&
     exit
 
+
+BUILD_CMD="nvcc -arch=sm_61 -o nbody-app *.cu"
+
 ssh $SSH_OPT $SSH_DEST \
-    "cd \"$RUN_DIR\"; $BUILD_CMD; nohup ./nbody-app &"
+    "cd \"$RUN_DIR\"; $BUILD_CMD; nohup ./nbody-app > output.txt 2>&1 &"
 [[ "$?" != "0" ]] &&
     echo "$(date): Cannot build or run the app on the remote machine." &&
     exit
@@ -69,7 +80,7 @@ rsync -e "ssh $SSH_OPT" \
     echo "$(date): Cannot fetch remote directory $RUN_DIR." &&
     exit
 
-
 echo "$(date): started $NAME"
+
 #ssh $SSH_OPT "mkdir -p ~/nbody-run/$NAME"
 
