@@ -3,29 +3,31 @@
 cd "$(dirname "$0")"
 printf "content-type: text/html\r\n\r\n"
 
-STATUS=$(./app-status)
-echo $STATUS | grep 'nbody' 2>&1 1>/dev/null
-[[ "$?" == "0" ]] &&  \
-    echo "$(date): Cannot start: already running." && \
+STATUS=$(./status)
+echo $STATUS | grep 'ready' 2>&1 1>/dev/null
+[[ "$?" != "0" ]] &&
+    echo '$(date): The remote machine is not running. Bailing out.' &&
     exit
 
-SSH_OPT="-p 8023 \
-    -o BatchMode=yes paperspace@localhost \
+SSH_OPT="-o Port=8023 \
+    -o BatchMode=yes \
+    -o NoHostAuthenticationForLocalhost=yes \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null"
+SSH_DEST=paperspace@localhost
 
 #base name of the run
-STEM=$(echo "$REQUEST_BODY" | 
-    tr '&' '\n' | 
-    grep -E '^[ \t]*name[ \t]*=' | 
-    cut -d '=' -f2 | 
+STEM=$(echo "$REQUEST_BODY" |
+    tr '&' '\n' |
+    grep -E '^[ \t]*name[ \t]*=' |
+    cut -d '=' -f2 |
     tr -d ' \t')
 
 #timestamp
-TS=$(echo "$REQUEST_BODY" | 
-    tr '&' '\n' | 
-    grep -E '^[ \t]*timestamp[ \t]*=' | 
-    cut -d '=' -f2 | 
+TS=$(echo "$REQUEST_BODY" |
+    tr '&' '\n' |
+    grep -E '^[ \t]*timestamp[ \t]*=' |
+    cut -d '=' -f2 |
     tr -d ' \t')
 
 [[ ! "$STEM" && ! "$TS" ]] && exit
@@ -33,9 +35,39 @@ TS=$(echo "$REQUEST_BODY" |
 #full name of the run
 NAME="${STEM:-run}-$TS"
 
-mkdir -p "/var/www/nbody/$NAME"
-pushd "/var/www/nbody/$NAME" 2>&1 1>/dev/null
-echo "$REQUEST_BODY" | tr '&' '\n' > params.txt
+mkdir -p "/var/www/nbody/${NAME}"
+chmod u=rwx,o=rx "/var/www/nbody/${NAME}"
+pushd "/var/www/nbody/${NAME}" 2>&1 1>/dev/null
+
+RUN_DIR="./nbody-run/${NAME}"
+BUILD_CMD="nvcc -arch=sm_61 -o nbody-app *.cu"
+
+ssh $SSH_OPT $SSH_DEST mkdir -p "$RUN_DIR"
+[[ "$?" != "0" ]] &&
+    echo "$(date): Cannot create $RUN_DIR on the remote machine." &&
+    exit
+
+rsync -e "ssh  $SSH_OPT"  \
+    --exclude 'data' --exclude 'cmake*' \
+    -a \
+    /var/www/nbody-app/  $SSH_DEST:"$RUN_DIR/"  2>&1
+#1>/dev/null
+[[ "$?" != "0" ]] &&
+    echo "$(date): Cannot upload the app code to the remote machine." &&
+    exit
+
+ssh $SSH_OPT $SSH_DEST \
+    "cd \"$RUN_DIR\"; $BUILD_CMD; nohup ./nbody-app &"
+[[ "$?" != "0" ]] &&
+    echo "$(date): Cannot build or run the app on the remote machine." &&
+    exit
+
+rsync -e "ssh $SSH_OPT" \
+    -a \
+    $SSH_DEST:"$RUN_DIR/" ./
+[[ "$?" != "0" ]] &&
+    echo "$(date): Cannot fetch remote directory $RUN_DIR." &&
+    exit
 
 
 echo "$(date): started $NAME"

@@ -1,6 +1,31 @@
 
 <script>
-    function getAppStatus() {
+	function getTimestamp() {
+		var t = new Date();
+		return "" + t.getFullYear() +"-" 
+			+ (t.getMonth() + 1 < 10? "0":"") + (t.getMonth()+1) + "-"
+			+ (t.getDate() < 10? "0":"") + t.getDate() + "--"
+			+ (t.getHours() < 10? "0":"") + t.getHours() + "-"
+			+ (t.getMinutes() < 10? "0":"") + t.getMinutes() + "-"
+			+ (t.getSeconds() < 10? "0":"") + t.getSeconds();	
+	}
+
+	function getParams() {
+
+		$( "#app-param-panel-impl" ).html((new Date().toString()) + 
+			": Fetching default parameters..");
+		$.post('/app-probe', {},
+			function(data, status) {
+				$( "#app-param-panel-impl" ).html(data);
+			});
+		$.post('/get-params', {},
+			function(data, status) {
+				$( "#area-params" ).html(data);
+			});
+	}
+	function getAppStatus() {
+		$( "#app-status-panel-impl" ).html(
+			new Date().toString() + ": Checking..." );
 		$.post('/app-status', {},
 			function(data, status) {
 				$( "#app-status-panel-impl" ).html(data);
@@ -13,24 +38,37 @@
 		});
 	}
 	function startApp() {
-		var theInput = document.getElementById("runName");
-		var name = theInput.value;
-		var tnow = new Date();
-		var ts = tnow.toISOString()
-			.replace(/[^a-z0-9]/g, " ")
-			.replace(/\s+$/, "")
-			.replace(/\s+/g, '-').toLowerCase();
+		var theInput = document.getElementById("app-start-run-name");
+		var runName = theInput.value.trim().replace(/ /g, "-");
+		if (!runName)
+			runName = "run";
 
-		$.post('/app-start', {
-			name: name,
-			seed: '100 ',
-			timestamp: ts,
+		$( "#app-start-panel-impl" ).html((new Date().toString()) +
+			": starting " + runName + "\n\n");
+
+		$.post('/app-start',
+			{
+				name: runName,
+				seed: '100 ',
+				timestamp: getTimestamp()
 			},
 			function(data, status) {
 				$( "#app-start-panel-impl" ).html(data);
+			}
+		);
+	}
+
+	function fetchResults() {
+		$.post('/fetch-results', {},
+			function(data, status) {
+				$( "#results-panel" ).html(data);
 			});
 	}
+
+
 	getAppStatus();
+	getParams();
+
 </script>
 
 <table>
@@ -48,16 +86,43 @@
 	</tr>
 	<tr>
 		<td>
-			<button onclick="javascript:startApp();">
-				Start Application
+			<button onclick="javascript:getParams();">
+				Reset Application Parameters
 			</button>
 		</td>
 		<td>
-			<pre id="app-start-panel-impl">
+			<pre id="app-param-panel-impl">
 
 			</pre>
 		</td>
 	</tr>
+	
+	<tr>
+		<td>
+			<button onclick="javascript:startApp();">
+				Start Application
+			</button>
+			<input type="text" maxlength="32" id="app-start-run-name">
+		</td>
+		<td>
+			<pre id="app-start-panel-impl">
+
+
+			</pre>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<button onclick="javascript:fetchResults();">
+				Fetch Results
+			</button>
+		</td>
+		<td>
+			<pre id="app-fetch-panel-impl">
+
+			</pre>
+		</td>
+	</tr>	
 	<tr>
 		<td>
 			<button onclick="javascript:killApp();">
@@ -72,15 +137,11 @@
 	</tr>
 </table>
 
+<textarea rows="10" cols="40" id="area-params">
+	...parameters...
+</textarea>
 
-<br>
-<input type="text" maxlength="32" id="runName">
+<hr>
 
-<form action="/upload" enctype="multipart/form-data" method="post">
-<p>
-<input type="file" name="datafile" size="40">
-</p>
-<div>
-<input type="submit" value="Send">
-</div>
-</form>
+
+<div id="results-panel"> </div>

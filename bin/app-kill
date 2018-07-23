@@ -7,4 +7,4 @@ ssh -p 8023 \
     -o BatchMode=yes paperspace@localhost \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
-    "killall nbody"  2>/dev/null
+    "killall nbody-app"  2>/dev/null

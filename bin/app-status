@@ -8,6 +8,12 @@ OUT=$(date; ssh -p 8023 \
     -o StrictHostKeyChecking=no \
     -o UserKnownHostsFile=/dev/null \
     "ps aux | grep nbody | grep -v 'grep'"  2>/dev/null)
-[[ "$?" == "255" ]] && echo "Cannot reach the remote machine: $OUT" && exit
+[[ "$?" == "255" ]] && 
+    echo $(date): "Cannot reach the remote machine: $OUT" && 
+    exit
 
-echo $OUT
+echo $OUT|grep 'nbody' 2>&1 1>/dev/null
+[[ "$?" != 0 ]] && 
+    OUT="The application is not running"
+
+echo $(date): "$OUT"

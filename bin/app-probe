@@ -6,7 +6,7 @@ printf "content-type: text/html\r\n\r\n"
 STATUS=$(./status)
 echo $STATUS | grep 'ready' 2>&1 1>/dev/null
 [[ "$?" != "0" ]] &&
-    echo '-- The remote machine is not running. Bailing out.' &&
+    echo '$(date): The remote machine is not running. Bailing out.' &&
     exit
 
 SSH_OPT="-o Port=8023 \
@@ -25,20 +25,23 @@ PARAMS_DIR="./nbody-run/_params"
 BUILD_CMD="nvcc -arch=sm_61 -o nbody-app *.cu"
 
 ssh $SSH_OPT $SSH_DEST "mkdir -p $PARAMS_DIR"
+[[ "$?" != "0" ]] && 
+    echo "$(date): Cannot create $PARAMS_DIR on the remote machine." &&
+    exit
+
 
 scp  $SSH_OPT  /var/www/nbody-app/*.cu $SSH_DEST:$PARAMS_DIR 1>/dev/null
 [[ "$?" != "0" ]] && 
-    echo "Cannot upload the app code to the remote machine." &&
+    echo "$(date): Cannot upload the app code to the remote machine." &&
     exit
 
 ssh $SSH_OPT $SSH_DEST \
     "cd $PARAMS_DIR; $BUILD_CMD; ./nbody-app -p > params.txt;" 
 [[ "$?" != "0" ]] && 
-    echo "Cannot build or run the app on the remote machine." &&
+    echo "$(date): Cannot build or run the app on the remote machine." &&
     exit
 
 scp $SSH_OPT "$SSH_DEST:$PARAMS_DIR/*" ./  1>/dev/null
 
-cat ./params.txt
+echo "$(date): Received default parameters from the remote machine"
 popd 2>&1 1>/dev/null
-
