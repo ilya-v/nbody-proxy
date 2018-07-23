@@ -1,0 +1,10 @@
+#!/bin/bash
+
+cd "$(dirname "$0")"
+printf "content-type: text/html\r\n\r\n"
+
+mkdir -p /var/www/nbody/_params
+chmod u=rwx,o=rx /var/www/nbody/_params
+cd /var/www/nbody/_params
+touch ./params.txt
+cat ./params.txt
