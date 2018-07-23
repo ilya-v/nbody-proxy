@@ -14,6 +14,6 @@ OUT=$(date; ssh -p 8023 \
 
 echo $OUT|grep 'nbody' 2>&1 1>/dev/null
 [[ "$?" != 0 ]] && 
-    OUT="The application is not running"
+    OUT="The application is not running\n"
 
-echo $(date): "$OUT"
+echo -e $(date): "$OUT"

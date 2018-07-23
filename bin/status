@@ -4,6 +4,9 @@ cd "$(dirname "$0")"
 export PAPERSPACE_API_KEY=$(./apikey)
 printf "content-type: text/html\r\n\r\n"
 echo "<pre>"
-echo "$(date)"
-paperspace machines list | jq '.[0] | .name, .state'
+echo -n "$(date): "
+paperspace machines list | 
+    jq '.[0] | .name, .state' |
+    tr -d '"' |
+    tr '\n' ' '
 echo "</pre>" 
