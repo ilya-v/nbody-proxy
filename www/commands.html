@@ -78,7 +78,6 @@
 		$.post('/fetch-results', {},
 			function(data, status) {
 				$( "#app-fetch-panel-impl" ).html(data);
-				$( "#results-panel" ).load("/results.html");
 			}
 		);
 	}
@@ -135,6 +134,7 @@
 			<button onclick="javascript:fetchResults();">
 				Fetch Results
 			</button>
+			<a href="/results">Show Results</a>
 		</td>
 		<td>
 			<pre id="app-fetch-panel-impl">
@@ -164,5 +164,5 @@
 
 
 <div id="results-panel">
-
+	<a href="/results">Results</a>
 </div>

@@ -10,18 +10,19 @@ SSH_OPT="-o Port=8023 \
     -o UserKnownHostsFile=/dev/null"
 SSH_DEST=paperspace@localhost
 
-mkdir -p "/var/www/nbody"
+mkdir -p "/var/www/nbody/results"
 chmod u=rwx,o=rx "/var/www/nbody"
-pushd "/var/www/nbody" 2>&1 1>/dev/null
+chmod u=rwx,o=rx "/var/www/nbody/results"
+pushd "/var/www/nbody/results" 2>&1 1>/dev/null
 
-RUN_DIR="./nbody-run"
+REMOTE_RUN_DIR="./nbody-run"
 
 rsync -e "ssh $SSH_OPT" \
     -a \
-    $SSH_DEST:"$RUN_DIR/" ./
+    $SSH_DEST:"$REMOTE_RUN_DIR/" ./
 
 [[ "$?" != "0" ]] &&
-    echo "$(date): Cannot fetch remote directory $RUN_DIR." &&
+    echo "$(date): Cannot fetch remote directory $REMOTE_RUN_DIR." &&
     exit
 
 chmod -R u+rwX,go+rX,go-w ./ 
@@ -33,7 +34,6 @@ sed 's!\./!!' |
 xargs -i echo @1{}@2{}@3 |
 sed -e 's!@1!<a href="/!' \
     -e 's!@2!">!' \
-    -e 's!@3!</a><br>!' > results.html
-#\<a href="/{}">{}\</a> > results.html
+    -e 's!@3!</a><br>!' > dir.html
 
 echo "$(date): results fetched"
