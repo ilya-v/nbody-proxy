@@ -20,7 +20,7 @@
 			});
 		$.post('/get-params', {},
 			function(data, status) {
-				$( "#area-params" ).html(data);
+				$( "#area-params" ).val(data);
 			});
 	}
 	function getAppStatus() {
