@@ -12,7 +12,7 @@ SSH_DEST=paperspace@localhost
 
 mkdir -p "/var/www/nbody/results"
 chmod u=rwx,o=rx "/var/www/nbody"
-chmod u=rwx,o=rx "/var/www/nbody/results"
+chmod -R u=rwx,o=rx "/var/www/nbody/results"
 pushd "/var/www/nbody/results" 2>&1 1>/dev/null
 
 REMOTE_RUN_DIR="./nbody-run"
@@ -21,11 +21,13 @@ rsync -e "ssh $SSH_OPT" \
     -a \
     $SSH_DEST:"$REMOTE_RUN_DIR/" ./
 
-[[ "$?" != "0" ]] &&
-    echo "$(date): Cannot fetch remote directory $REMOTE_RUN_DIR." &&
-    exit
+RSYNC_RES="$?"
 
 chmod -R u+rwX,go+rX,go-w ./ 
+
+[[ "$RSYNC_RES" != "0" ]] &&
+    echo "$(date): Cannot fetch remote directory $REMOTE_RUN_DIR." &&
+    exit
 
 find .  -maxdepth 1 -type d  |
 grep -vE '\.$' | 
