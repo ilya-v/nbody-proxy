@@ -36,7 +36,7 @@ scp  $SSH_OPT  /var/www/nbody-app/*.cu $SSH_DEST:$PARAMS_DIR 1>/dev/null
     exit
 
 ssh $SSH_OPT $SSH_DEST \
-    "cd $PARAMS_DIR; $BUILD_CMD; ./nbody-app -p | tr -d'#' > params.txt;"
+    "cd $PARAMS_DIR; $BUILD_CMD; ./nbody-app -p | tr -d '#' > params.txt;"
 [[ "$?" != "0" ]] && 
     echo "$(date): Cannot build or run the app on the remote machine." &&
     exit
