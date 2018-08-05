@@ -11,8 +11,7 @@ SSH_OPT="-o Port=8023 \
 SSH_DEST=paperspace@localhost
 
 mkdir -p "/var/www/nbody/results"
-chmod u=rwx,o=rx "/var/www/nbody"
-chmod -R u=rwx,o=rx "/var/www/nbody/results"
+chmod u=rwx,go=rx "/var/www/nbody/results"
 pushd "/var/www/nbody/results" 2>&1 1>/dev/null
 
 REMOTE_RUN_DIR="./nbody-run"
@@ -23,7 +22,10 @@ rsync -e "ssh $SSH_OPT" \
 
 RSYNC_RES="$?"
 
-chmod -R u+rwX,go+rX,go-w ./ 
+chmod -R u+rwX,go+rX,go-w ./
+
+find . -maxdepth 1 -mindepth 1 -type d |
+    xargs -n 1 cp /var/www/nbody/*plot.* "{}"
 
 [[ "$RSYNC_RES" != "0" ]] &&
     echo "$(date): Cannot fetch remote directory $REMOTE_RUN_DIR." &&

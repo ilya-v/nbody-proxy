@@ -21,7 +21,7 @@ mkdir -p /var/www/nbody
 cp -R ./www/* /var/www/nbody
 chown -R www-data:www-data /var/www/nbody
 chmod  -R u=rw,g=r,o=r /var/www/nbody
-chmod  u+x,g+x,o+x /var/www/nbody
+chmod  -R ugo+X /var/www/nbody
 
 
 mkdir -p /var/www/.ssh
@@ -41,7 +41,7 @@ mv * ../
 cd ..
 chown -R www-data:www-data /var/www/nbody-app
 chmod  -R u=rw,g=r,o=r /var/www/nbody-app
-chmod  u+x,g+x,o+x /var/www/nbody-app
+chmod  -R ugo+X /var/www/nbody-app
 
 cd $SCRIPTPATH
 
