@@ -34,6 +34,7 @@ scp  $SSH_OPT  /var/www/nbody-app/*.cu $SSH_DEST:$PARAMS_DIR 1>/dev/null
 [[ "$?" != "0" ]] && 
     echo "$(date): Cannot upload the app code to the remote machine." &&
     exit
+ssh $SSH_OPT $SSH_DEST "rm $PARAMS_DIR/params.txt" 2>/dev/null
 
 ssh $SSH_OPT $SSH_DEST \
     "cd $PARAMS_DIR; $BUILD_CMD; ./nbody-app -p | tr -d '#' > params.txt;"
