@@ -32,7 +32,7 @@ mkdir -p ./_plot
     exit 3
 
 chmod u=rwx,go=rx ./_plot
-cp -R /var/www/nbody-app/plot/*plot.txt ./_plot/
+cp -R /var/www/nbody-app/plot/* ./_plot/
 [[ "$?" != "0" ]] && 
     echo "Cannot create _plot in $OUTPUT_DIR" &&
     exit 4
